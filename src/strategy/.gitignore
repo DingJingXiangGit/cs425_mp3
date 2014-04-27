@@ -1,0 +1,6 @@
+/BasicMulticast.class
+/CausalOrderMulticast.class
+/DelaySender.class
+/ReliableUnicastReceiver.class
+/ReliableUnicastSender.class
+/TotalOrderMulticast.class

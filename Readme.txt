@@ -1,7 +1,9 @@
 ==================
 CS 425 Spring 2014 
-	  MP 2
+	  MP 3
 ==================
+
+TODO: Fix this file
 
 ------------------------
 Netids: cting4, reziapo1
@@ -25,9 +27,9 @@ Config File Format
 		[id] [ip] [port] [name] [group number]
 
 	Example:
-		0 127.0.0.1 8001 foo 1
-		1 127.0.0.1 8002 bar 1
-		2 127.0.0.1 8003 fb 1
+		0 127.0.0.1 8001 foo
+		1 127.0.0.1 8002 bar
+		2 127.0.0.1 8003 fb
 	
 	Additional line needed for the sequencer, example:
 		100 127.0.0.1 8010 sequencer 1
@@ -58,17 +60,3 @@ Running / Command line usage
 
 	After all clients connect (also sequencer in total ordering)
 	type messages to send
-
-----------
-Algorithms
-----------
-(See report for details)
-	- Causal Order Multicast
-		Uses vector/Lamport timestamps to achieve causal ordering in message delivery
-		Chat clients deliver each message only when proper causality conditions are satisfied
-		
-	- Total Ordering
-		Without Sequencer: 
-			ISIS algorithm multicast, where all clients agree among themselves on message delivery order
-		With Sequencer: 
-			Chat clients also send messages to a sequencer which specifies the order of message delivery
