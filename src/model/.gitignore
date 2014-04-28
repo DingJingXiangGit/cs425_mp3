@@ -9,3 +9,5 @@
 /RetransmissionTask.class
 /TotalOrderMessageType.class
 /TotalOrderMulticastMessage.class
+/BasicMessage.class
+/KeyValueManager.class

@@ -17,7 +17,7 @@ public class Message implements Serializable{
 	private static final long serialVersionUID = 1823741L;
 
 	@XmlElement(name="Content")
-	private BasicMulticastMessage _content;
+	private BasicMessage _content;
 	
 	@XmlElement(name="Sequence")
 	private int _sequence;
@@ -32,7 +32,7 @@ public class Message implements Serializable{
 		
 	}
 	
-	public BasicMulticastMessage getContent(){
+	public BasicMessage getContent(){
 		return _content;
 	}
 	public int getSequence(){
@@ -47,10 +47,6 @@ public class Message implements Serializable{
 		return _action;
 	}
 	
-	public void setContent(BasicMulticastMessage content){
-		this._content = content;
-	}
-	
 	public void setSequence(int sequence){
 		//System.out.println("original "+this._sequence +" to " +sequence );
 		this._sequence = sequence;
@@ -60,15 +56,19 @@ public class Message implements Serializable{
 		this._id = id;
 	}
 	
+	public void setContent(BasicMessage content){
+		this._content = content;
+	}
+	
 	public void setAction(String action){
 		this._action = action;
 	}
 	
 	public Message(Message msg) {
-		this._content =msg._content;
 		this._id = msg._id;
 		this._sequence = msg._sequence;
 		this._action = msg._action;
+		this._content = msg._content;
 	}
 
 	public byte[] getBytes(){
@@ -86,7 +86,7 @@ public class Message implements Serializable{
 	}
 	
 	public String toString(){
-		return String.format("{sequence:%d, id:%d, action:%s, content:%s}", _sequence, _id, _action, _content);
+		return String.format("{sequence:%d, id:%d, action:%s, content:%s}", _sequence, _id, _content, _action);
 	}
 	
 	public static Message parse(byte[] content){
@@ -103,6 +103,6 @@ public class Message implements Serializable{
 	}
 	
 	public String getAckString(){
-		return String.format("{%d, %d, ack, null}", _sequence,_id);
+		return String.format("{%d, %d, ack, null}", _sequence, _id);
 	}
 }

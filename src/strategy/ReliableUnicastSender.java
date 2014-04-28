@@ -93,25 +93,19 @@ public class ReliableUnicastSender {
 				_timerTable.get(memberId).put(new Integer(sendSequence), timer);
 				_cachedRetransmissionTask.get(memberId).put(new Integer(sendSequence), timerTask);
 
-                // Only send with some probability
-				if (_rand.nextDouble() >= _profile.getDropRate()) {
-                    // Delay based on input argument
-                    int meanDelay = _profile.getDelay();
-                    if (meanDelay != 0) {
-                        Timer delayTimer = new Timer();
-                        TimerTask delaySender = new DelaySender(sendPacket, _socket);
-                        delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
-                    }else{
-                    	_socket.send(sendPacket);
-                    }
-                    if(_profile.isDetailMode){
-                    	System.out.println(message.getContent().getContent() + " sent");
-                    }
-				}else{
-					if(_profile.isDetailMode){
-						System.out.println(message.getContent().getContent() + " dropped");
-					}
-				}
+                // Delay based on input argument
+                int meanDelay = member.getDelaySeconds();
+                if (meanDelay != 0) {
+                    Timer delayTimer = new Timer();
+                    TimerTask delaySender = new DelaySender(sendPacket, _socket);
+                    delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
+                }else{
+                	_socket.send(sendPacket);
+                }
+                if(_profile.isDetailMode){
+                	System.out.println(message.getContent().getContent() + " sent");
+                }
+
                 // Set up retransmission in case unicast doesn't reach
 				timer.schedule(timerTask, EXPIRE_TIME);
 				_nextSendSequence.put(memberId, sendSequence + 1);
@@ -144,7 +138,7 @@ public class ReliableUnicastSender {
             if (timer == null) {
                 return;
             }
-//			System.out.println("out message: "+message.getSequence() +" source "+message.getId());
+
 			task.cancel();
 			timer.cancel();
 			timer.purge();
@@ -160,25 +154,20 @@ public class ReliableUnicastSender {
 				_cachedRetransmissionTask.get(member.getId()).put(sequence, timerTask);
 				
 				double rate = _rand.nextDouble();
-				if (rate >= _profile.getDropRate()) {
 					
-					int meanDelay = _profile.getDelay();
-                    if (meanDelay != 0) {
-                        Timer delayTimer = new Timer();
-                        TimerTask delaySender = new DelaySender(sendPacket, _socket);
-                        delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
-                    }else{
-                    	_socket.send(sendPacket);
-                    }
-					//_socket.send(sendPacket);
-                    if(_profile.isDetailMode){
-                    	System.out.println(message.getContent().getContent() + " resend ");
-                    }
-				}else{
-					if(_profile.isDetailMode){
-						System.out.println(message.getContent().getContent() + " resend dropped ");
-					}
-				}
+				int meanDelay = member.getDelaySeconds();
+                if (meanDelay != 0) {
+                    Timer delayTimer = new Timer();
+                    TimerTask delaySender = new DelaySender(sendPacket, _socket);
+                    delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
+                }else{
+                	_socket.send(sendPacket);
+                }
+                
+                if(_profile.isDetailMode){
+                	System.out.println(message.getContent().getContent() + " resend ");
+                }
+
 				timer.schedule(timerTask, EXPIRE_TIME);
 
 			} catch (Exception e) {
@@ -208,11 +197,10 @@ public class ReliableUnicastSender {
 				_cachedMessages.get(memberId).remove(sequence);
 				_cachedRetransmissionTask.get(memberId).remove(sequence);
 			}else{
-//				System.out.println("null timer.");
+				//System.out.println("null timer.");
 			}
 		}
 		//System.out.println("[end]ack sequence "+sequence);
-
 	}
 
     /*
@@ -223,7 +211,6 @@ public class ReliableUnicastSender {
 		Message message;
 		byte[] data;
 		DatagramPacket sendPacket;
-		double rate = 0.0;
 		
 		message = new Message(msg);
 		message.setId(Profile.getInstance().id);
@@ -232,25 +219,18 @@ public class ReliableUnicastSender {
 		data =  message.getBytes();
 		address = InetAddress.getByName(member._ip);
 		sendPacket = new DatagramPacket(data, data.length, address,  member._port);
-		rate = _rand.nextDouble();
 		
-		if (rate >= _profile.getDropRate()) {
-			int meanDelay = _profile.getDelay();
-            if (meanDelay != 0) {
-                Timer delayTimer = new Timer();
-                TimerTask delaySender = new DelaySender(sendPacket, _socket);
-                delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
-            }else{
-            	_socket.send(sendPacket);
-            }
-            //_socket.send(sendPacket);
-			if(_profile.isDetailMode){
-				System.out.println("ack message sent.");
-			}
-		}else{
-			if(_profile.isDetailMode){
-				System.out.println("ack message dropped.");
-			}
+		int meanDelay = member.getDelaySeconds();
+        if (meanDelay != 0) {
+            Timer delayTimer = new Timer();
+            TimerTask delaySender = new DelaySender(sendPacket, _socket);
+            delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
+        }else{
+        	_socket.send(sendPacket);
+        }
+
+		if(_profile.isDetailMode){
+			System.out.println("ack message sent.");
 		}
 	}
 }

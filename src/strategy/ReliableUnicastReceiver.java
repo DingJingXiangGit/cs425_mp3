@@ -1,5 +1,6 @@
 package strategy;
 
+import model.KeyValueManager;
 import model.Member;
 import model.MemberIndexer;
 import model.Message;
@@ -98,7 +99,6 @@ public class ReliableUnicastReceiver implements Runnable {
 					_nextSequenceTable.put(senderId, _nextReceiveSequence);
 				} else if (message.getAction().equals("ack")) {
 					//receive ack message, cancel retransmission
-                    //System.out.println(message.toString());
 					_unicastSender.ack(message);
 				}
 			} catch (IOException e) {
@@ -108,9 +108,7 @@ public class ReliableUnicastReceiver implements Runnable {
 	}
 	
 	public void delivery(Message message){
-		//if(message.getId() != Profile.getInstance().id){
-		BasicMulticast basicMulticast = BasicMulticast.getInstance();
-		basicMulticast.delivery(message.getContent());
-		//}
+		KeyValueManager manager = KeyValueManager.getInstance();
+		manager.deliver(message);
 	}
 }

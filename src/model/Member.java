@@ -3,12 +3,10 @@ public class Member {
 	public String _ip;
 	public int _id;
 	public int _port;
-	public String _userName;
-	public int _groupId;
-	
+	public String _name;
+	public int _delaySeconds;
 	
 	public Member(){
-		_groupId = -1;
 		_id = -1;
 	}
 
@@ -25,6 +23,10 @@ public class Member {
 	}
 	
 	public String getUsername(){
-		return _userName;
+		return _name;
+	}
+	
+	public int getDelaySeconds(){
+		return _delaySeconds;
 	}
 }
