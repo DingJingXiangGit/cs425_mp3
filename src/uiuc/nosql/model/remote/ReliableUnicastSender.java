@@ -88,7 +88,7 @@ public class ReliableUnicastSender {
 				address = InetAddress.getByName(replica.getIp());
 				sendPacket = new DatagramPacket(data, data.length, address,  replica.getPort());
 				timer = new Timer();
-				timerTask = new RetransmissionTask(new Integer(sendSequence), replica, this);
+				timerTask = new MessageRetransmitter(new Integer(sendSequence), replica, this);
 				_cachedMessages.get(replicaHashCode).put(new Integer(sendSequence), message);
 				_timerTable.get(replicaHashCode).put(new Integer(sendSequence), timer);
 				_cachedRetransmissionTask.get(replicaHashCode).put(new Integer(sendSequence), timerTask);
@@ -125,7 +125,7 @@ public class ReliableUnicastSender {
     /*
         The retransmission thread handler
      */
-	public void resend(RetransmissionTask task) {
+	public void resend(MessageRetransmitter task) {
 		Timer timer;
 		Message message;
 		ServerNode replicaNode;
@@ -154,7 +154,7 @@ public class ReliableUnicastSender {
 			//message.getId();
 			
 			timer = new Timer();
-			timerTask = new RetransmissionTask(sequence, replicaNode, this);
+			timerTask = new MessageRetransmitter(sequence, replicaNode, this);
 			data =  message.getBytes();
 			try {
 				address = InetAddress.getByName(replicaNode.getIp());
@@ -200,10 +200,10 @@ public class ReliableUnicastSender {
 		TimerTask task;
 		int replicaHashCode = message.getId();
 		int sequence = message.getSequence();
-		System.out.println("[start]ack sequence target: " + message);
+		//System.out.println("[start]ack sequence target: " + message);
 		synchronized(_mutex){
-			System.out.println("memberId is?= "+replicaHashCode);
-			System.out.println("timer table size = "+_timerTable.get(replicaHashCode).size());
+			//System.out.println("memberId is?= "+replicaHashCode);
+			//System.out.println("timer table size = "+_timerTable.get(replicaHashCode).size());
 			timer = _timerTable.get(replicaHashCode).get(sequence);
 			task = _cachedRetransmissionTask.get(replicaHashCode).get(sequence);
 			if(timer != null){
@@ -217,7 +217,7 @@ public class ReliableUnicastSender {
 //				System.out.println("null timer.");
 			}
 		}
-		System.out.println("[end]ack sequence "+sequence);
+		//System.out.println("[end]ack sequence "+sequence);
 
 	}
 

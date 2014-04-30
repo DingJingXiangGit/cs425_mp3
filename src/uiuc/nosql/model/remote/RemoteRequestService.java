@@ -2,7 +2,7 @@ package uiuc.nosql.model.remote;
 
 import java.util.Map;
 
-import uiuc.nosql.model.Request;
+import uiuc.nosql.model.IMessageContent;
 import uiuc.nosql.model.NodeConf;
 
 public class RemoteRequestService{
@@ -16,7 +16,7 @@ public class RemoteRequestService{
 		localHashCode = NodeConf.getInstance().getMachineHashCode();
 	}
 	
-	public void execute(Request command, int hashCode){
+	public void execute(IMessageContent command, int hashCode){
 		ServerNode replica = serverNodes.get(hashCode);
 		Message message = new Message();
 		message.setAction("delivery");

@@ -2,11 +2,11 @@ package uiuc.nosql.model.remote;
 
 import java.util.TimerTask;
 
-public class RetransmissionTask extends TimerTask {
+public class MessageRetransmitter extends TimerTask {
 	private int _sequence = 0;
 	private ServerNode _member;
 	private ReliableUnicastSender _owner;
-	public RetransmissionTask(int seq, ServerNode member, ReliableUnicastSender owner){
+	public MessageRetransmitter(int seq, ServerNode member, ReliableUnicastSender owner){
 		this._sequence = seq;
 		this._member = member;
 		this._owner = owner;

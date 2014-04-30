@@ -3,51 +3,61 @@ import java.io.*;
 import java.util.Scanner;
 
 import uiuc.nosql.controller.DatabaseController;
+import uiuc.nosql.controller.TaskManager;
 import uiuc.nosql.model.Action;
+import uiuc.nosql.model.NodeConf;
 import uiuc.nosql.model.Request;
 import uiuc.nosql.model.Level;
+import uiuc.nosql.model.task.Task;
 public class Console {
 	private DatabaseController controller;
+	private TaskManager taskManager;
+	private NodeConf conf;
 	public Console(){
 		controller = DatabaseController.getInstance();
+		taskManager = TaskManager.getInstance();
+		conf = NodeConf.getInstance();
 	}
 	
 	public void start(){
 		Scanner scanner = new Scanner(System.in);
 		String operator = null;
-		Request command = null;
+		Request request = null;
+		Task task = null;
 		while(scanner.hasNext()){
 			operator = scanner.next();
 			if(operator.equals("delete")){
-				command = new Request();
-				command.setAction(Action.Delete);
-				command.setKey(scanner.next());
+				request = new Request();
+				request.setAction(Action.Delete);
+				request.setKey(scanner.next());
 			}else if(operator.equals("get")){
-				command = new Request();
-				command.setAction(Action.Get);
-				command.setKey(scanner.next());
-				command.setLevel(Level.valueOf(scanner.next()));
+				request = new Request();
+				request.setAction(Action.Get);
+				request.setKey(scanner.next());
+				request.setLevel(Level.valueOf(scanner.next()));
 			}else if(operator.equals("insert")){
-				command = new Request();
-				command.setAction(Action.Insert);
-				command.setKey(scanner.next());
-				command.setValue(scanner.next());
-				command.setLevel(Level.valueOf(scanner.next()));
+				request = new Request();
+				request.setAction(Action.Insert);
+				request.setKey(scanner.next());
+				request.setValue(scanner.next());
+				request.setLevel(Level.valueOf(scanner.next()));
 			}else if(operator.equals("update")){
-				command = new Request();
-				command.setAction(Action.Update);
-				command.setKey(scanner.next());
-				command.setValue(scanner.next());
-				command.setLevel(Level.valueOf(scanner.next()));
+				request = new Request();
+				request.setAction(Action.Update);
+				request.setKey(scanner.next());
+				request.setValue(scanner.next());
+				request.setLevel(Level.valueOf(scanner.next()));
 			}else if(operator.equals("show-all")){
-				command = new Request();
-				command.setAction(Action.ShowAll);
+				request = new Request();
+				request.setAction(Action.ShowAll);
 			}
-			if(command != null){
-				System.out.println(command);
-				controller.execute(command);
+			if(request != null){
+				System.out.println(request);
+				task = taskManager.registerTask(request);
+				request.setSource(conf.getMachineHashCode());
+				controller.execute(task);
 			}
-			command = null;
+			request = null;
 		}
 	}
 }

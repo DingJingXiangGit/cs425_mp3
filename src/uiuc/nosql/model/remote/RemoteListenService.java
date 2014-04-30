@@ -1,8 +1,11 @@
 package uiuc.nosql.model.remote;
 
 import uiuc.nosql.controller.DatabaseController;
+import uiuc.nosql.controller.TaskManager;
+import uiuc.nosql.model.IMessageContent;
 import uiuc.nosql.model.Request;
 import uiuc.nosql.model.NodeConf;
+import uiuc.nosql.model.Response;
 
 public class RemoteListenService {
 	private ReliableUnicastReceiver unicastReceiver;
@@ -24,8 +27,15 @@ public class RemoteListenService {
 	public void acceptMessage(Message message){
 		DatabaseController database;
 		database = DatabaseController.getInstance();
-		Request command = message.getContent();
-		database.execute(command);
+		IMessageContent content = message.getContent();
+		if(content instanceof Request){
+			Request command = (Request)content;
+			database.execute(command);
+		}else{
+			Response response = (Response)content;
+			System.out.println(response.toString());
+			TaskManager.getInstance().processResponse(response);
+		}
 	}
 	
 	public void start(){

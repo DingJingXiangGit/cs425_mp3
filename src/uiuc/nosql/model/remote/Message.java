@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import uiuc.nosql.model.IMessageContent;
 import uiuc.nosql.model.Request;
 
 public class Message implements Serializable{
@@ -13,7 +14,7 @@ public class Message implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1823741L;
-	private Request _content;
+	private IMessageContent _content;
 	private int _sequence;
 	private int _id;
 	private String _action;
@@ -22,7 +23,7 @@ public class Message implements Serializable{
 		
 	}
 	
-	public Request getContent(){
+	public IMessageContent getContent(){
 		return _content;
 	}
 	public int getSequence(){
@@ -37,7 +38,7 @@ public class Message implements Serializable{
 		return _action;
 	}
 	
-	public void setContent(Request content){
+	public void setContent(IMessageContent content){
 		this._content = content;
 	}
 	
@@ -78,6 +79,7 @@ public class Message implements Serializable{
 	public String toString(){
 		return String.format("{sequence:%d, id:%d, action:%s, content:%s}", _sequence, _id, _action, _content);
 	}
+	
 	
 	public static Message parse(byte[] content){
 		ByteArrayInputStream bis;

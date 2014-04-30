@@ -2,7 +2,7 @@ package uiuc.nosql.model;
 
 import java.io.Serializable;
 
-public class Request implements Serializable{
+public class Request implements Serializable, IMessageContent{
 	/**
 	 * 
 	 */
@@ -17,7 +17,18 @@ public class Request implements Serializable{
 	private String value;
 	private long timestamp;
 	private Level level;
+	private int source;
+	private int taskId;
 	
+	
+	public int getSource() {
+		return source;
+	}
+
+	public void setSource(int source) {
+		this.source = source;
+	}
+
 	public Request(){
 		java.util.Date date= new java.util.Date();
 		this.timestamp = date.getTime();
@@ -64,6 +75,14 @@ public class Request implements Serializable{
 	}
 	
 	public String toString(){
-		return this.action + " " +this.key +" "+this.value + " " +this.level + " " +this.timestamp;
+		return "task #"+taskId+": request "+this.action + " " +this.key +" "+this.value + " " +this.level + " " +this.timestamp;
+	}
+
+	public int getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(int taskId) {
+		this.taskId = taskId;
 	}
 }

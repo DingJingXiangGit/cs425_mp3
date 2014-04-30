@@ -2,7 +2,8 @@ package uiuc.nosql.model;
 
 import java.io.Serializable;
 
-public class Tuple implements Comparable<Tuple>, Serializable{
+public class Tuple implements Serializable{
+	// Comparable<Tuple>,
 	/**
 	 * 
 	 */
@@ -37,11 +38,12 @@ public class Tuple implements Comparable<Tuple>, Serializable{
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+	/*
 	@Override
 	public int compareTo(Tuple other) {
 		return this.key.compareTo(other.getKey());
 	}
+	*/
 	
 	@Override
 	public String toString(){

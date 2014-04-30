@@ -16,6 +16,7 @@ public class NodeConf {
 	private NodeConf(){
 		serverNodes = new HashMap<Integer, ServerNode>();
 		nodeIds = new ArrayList<Integer>();
+		isDetailMode = false;
 	}
 	
 	public static NodeConf getInstance(){
