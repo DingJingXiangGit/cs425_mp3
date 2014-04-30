@@ -1,5 +1,4 @@
 package uiuc.nosql.view;
-import java.io.*;
 import java.util.Scanner;
 
 import uiuc.nosql.controller.DatabaseController;
@@ -50,11 +49,19 @@ public class Console {
 			}else if(operator.equals("show-all")){
 				request = new Request();
 				request.setAction(Action.ShowAll);
+			}else if(operator.equals("search")){
+				request = new Request();
+				request.setAction(Action.Search);
+				request.setKey(scanner.next());
+			}else if(operator.equals("exit")){
+				System.out.println("Bye.");
+				System.exit(-1);
 			}
+			
 			if(request != null){
 				System.out.println(request);
 				task = taskManager.registerTask(request);
-				request.setSource(conf.getMachineHashCode());
+				request.setInitiator(conf.getMachineHashCode());
 				controller.execute(task);
 			}
 			request = null;

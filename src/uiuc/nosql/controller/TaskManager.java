@@ -1,7 +1,6 @@
 package uiuc.nosql.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import uiuc.nosql.model.Action;
@@ -76,12 +75,12 @@ public class TaskManager {
 	}
 	
 	public void processResponse(Response response){
-		System.out.println("process response task id:"+response.getTaskId());
+		System.out.println("process response task id:"+response);
 		int taskId = response.getTaskId();
 		if(tasksTable.containsKey(taskId)){
 			boolean finished = tasksTable.get(taskId).consume(response);
 			if(finished){
-				System.out.println(tasksTable.get(taskId) +"  finished. numReplicas:" +numReplicas);
+				//System.out.println(tasksTable.get(taskId) +"  finished. numReplicas:" +numReplicas);
 				tasksTable.remove(taskId);
 			}
 		}

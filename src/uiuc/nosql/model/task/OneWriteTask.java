@@ -1,34 +1,14 @@
 package uiuc.nosql.model.task;
 
-import uiuc.nosql.model.Action;
-import uiuc.nosql.model.Level;
 import uiuc.nosql.model.Response;
 
 public class OneWriteTask  extends Task{
-	private Level level;
-	private Action action;
+	
 	private int taskId;
 	//private int source;
 	//private int numReplicas;
 	
 	public OneWriteTask(){
-		//source = -1;
-	}
-	
-	public Level getLevel() {
-		return level;
-	}
-	
-	public void setLevel(Level level) {
-		this.level = level;
-	}
-	
-	public Action getAction() {
-		return action;
-	}
-	
-	public void setAction(Action action) {
-		this.action = action;
 	}
 	
 	public int getTaskId() {
@@ -40,15 +20,19 @@ public class OneWriteTask  extends Task{
 	}
 
 	public boolean consume(Response response) {
-		int source = response.getSource();
+		int source = response.getSender();
 		if(source != -1){
-			System.out.println("task #"+taskId+" receives acks from: "+source);
-			//this.source = source;
+			//System.out.println("task #"+taskId+" receives acks from: "+source);
+			System.out.println(request + " completed");
 			return true;
 		}
 		return false;
 	}
-
+	
+	public String toString(){
+		return "One Write " + taskId;
+	}
+	
 	/*
 	public int getNumReplicas() {
 		return numReplicas;
@@ -59,7 +43,5 @@ public class OneWriteTask  extends Task{
 	}
 	*/
 	
-	public String toString(){
-		return "All Write " + taskId;
-	}
+	
 }

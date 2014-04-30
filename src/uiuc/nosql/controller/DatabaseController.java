@@ -12,6 +12,7 @@ import uiuc.nosql.model.Response;
 import uiuc.nosql.model.Tuple;
 import uiuc.nosql.model.remote.RemoteListenService;
 import uiuc.nosql.model.remote.RemoteRequestService;
+import uiuc.nosql.model.remote.ServerNode;
 import uiuc.nosql.model.task.Task;
 
 public class DatabaseController {
@@ -46,13 +47,15 @@ public class DatabaseController {
 		Request request = task.getRequest();
 		if(request.getAction() == Action.ShowAll){
 			digest(request);
+		}else if(request.getAction() == Action.Search){
+			search(request);
 		}else{
 			int total = Math.min(this.numReplicas, conf.getServerNodes().size());
 			int[] hashCodes = hashService.hash(request.getKey(), total);
 			int hashCode = -1;
 			for(int i = 0; i < hashCodes.length; ++i){
 				hashCode = hashCodes[i];
-				System.out.println("target code = "+hashCode +" local code = "+localHashCode);
+				//System.out.println("target code = "+hashCode +" local code = "+localHashCode);
 				if(hashCode == localHashCode){
 					digest(request);
 				}else{
@@ -62,23 +65,41 @@ public class DatabaseController {
 		}
 	}
 	
+	private void search(Request request) {
+		String key = request.getKey();
+		int total = Math.min(this.numReplicas, conf.getServerNodes().size());
+		int[] hashCodes = hashService.hash(key, total);
+		int hashCode = -1;
+		ServerNode replica;
+		for(int i = 0; i < hashCodes.length; ++i){
+			hashCode = hashCodes[i];
+			replica = conf.getServerNode(hashCode);
+			System.out.println(replica);
+		}
+	}
+
 	public void execute(Request command){
 		digest(command);
 	}
 	
 	private void digest(Request command){
 		if(command.getAction() == Action.Delete){
-			this.dataStore.delete(command.getKey());
+			Tuple tuple = new Tuple();
+			tuple.setKey(command.getKey());
+			tuple.setValue(command.getValue());
+			tuple.setTimestamp(command.getTimestamp());
+			this.dataStore.delete(tuple);
 		}else if(command.getAction() == Action.Get){
 			Tuple tuple = this.dataStore.get(command.getKey());
 			Response response = new Response();
 			List<Tuple> result = new LinkedList<Tuple>();
 			result.add(tuple);
 			response.setTuples(result);
-			response.setSource(localHashCode);
+			response.setInitiator(command.getInitiator());
+			response.setSender(localHashCode);
 			response.setTaskId(command.getTaskId());
-			if(command.getSource() != localHashCode){
-				this.remoteRequestService.execute(response, command.getSource());
+			if(command.getInitiator() != localHashCode){
+				this.remoteRequestService.execute(response, command.getInitiator());
 			}else{
 				TaskManager.getInstance().processResponse(response);
 			}
@@ -90,10 +111,11 @@ public class DatabaseController {
 			this.dataStore.update(tuple);
 			
 			Response response = new Response();
-			response.setSource(localHashCode);
+			response.setInitiator(command.getInitiator());
 			response.setTaskId(command.getTaskId());
-			if(command.getSource() != localHashCode){
-				this.remoteRequestService.execute(response, command.getSource());
+			response.setSender(localHashCode);
+			if(command.getInitiator() != localHashCode){
+				this.remoteRequestService.execute(response, command.getInitiator());
 			}else{
 				TaskManager.getInstance().processResponse(response);
 			}
@@ -104,10 +126,11 @@ public class DatabaseController {
 			tuple.setTimestamp(command.getTimestamp());
 			this.dataStore.insert(tuple);
 			Response response = new Response();
-			response.setSource(localHashCode);
+			response.setInitiator(command.getInitiator());
 			response.setTaskId(command.getTaskId());
-			if(command.getSource() != localHashCode){
-				this.remoteRequestService.execute(response, command.getSource());
+			response.setSender(localHashCode);
+			if(command.getInitiator() != localHashCode){
+				this.remoteRequestService.execute(response, command.getInitiator());
 			}else{
 				TaskManager.getInstance().processResponse(response);
 			}
@@ -116,14 +139,6 @@ public class DatabaseController {
 			System.out.println("there are "+tuples.size() +" in local server.");
 			for(Tuple tuple: tuples){
 				System.out.println(tuple);
-			}
-			Response response = new Response();
-			response.setSource(localHashCode);
-			response.setTaskId(command.getTaskId());
-			if(command.getSource() != localHashCode){
-				this.remoteRequestService.execute(response, command.getSource());
-			}else{
-				TaskManager.getInstance().processResponse(response);
 			}
 		}
 	}

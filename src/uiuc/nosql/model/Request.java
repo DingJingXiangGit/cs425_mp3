@@ -17,16 +17,16 @@ public class Request implements Serializable, IMessageContent{
 	private String value;
 	private long timestamp;
 	private Level level;
-	private int source;
+	private int initiator;
 	private int taskId;
 	
 	
-	public int getSource() {
-		return source;
+	public int getInitiator() {
+		return initiator;
 	}
 
-	public void setSource(int source) {
-		this.source = source;
+	public void setInitiator(int source) {
+		this.initiator = source;
 	}
 
 	public Request(){
@@ -75,7 +75,14 @@ public class Request implements Serializable, IMessageContent{
 	}
 	
 	public String toString(){
-		return "task #"+taskId+": request "+this.action + " " +this.key +" "+this.value + " " +this.level + " " +this.timestamp;
+		return String.format("{content: request, initiaor: %d, task:%d, action: %s, key: %s, value: %s, level: %s, timestamp:%d}",
+				initiator,
+				taskId,
+				action,
+				key,
+				value,
+				level,
+				timestamp);
 	}
 
 	public int getTaskId() {

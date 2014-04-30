@@ -19,21 +19,35 @@ public class DataStoreService {
 	public void insert(Tuple tuple){
 		String key = tuple.getKey();
 		synchronized(mutex){
-			System.out.println("add tuple = "+tuple);
-			this.storage.put(key, tuple);
+			if(this.storage.containsKey(key)){
+				Tuple item = this.storage.get(key);
+				if(item.getTimestamp() < tuple.getTimestamp()){
+					this.storage.put(key, tuple);
+				}
+			}else{
+				this.storage.put(key, tuple);
+			}
 		}
 	}
 	
-	public void delete(String key){
+	public void delete(Tuple tuple){
+		String key = tuple.getKey();
 		synchronized(mutex){
-			System.out.println("delete = "+key);
-			this.storage.remove(key);
+			//System.out.println("delete = "+key);
+			if(this.storage.containsKey(key)){
+				Tuple item = this.storage.get(key);
+				if(item.getTimestamp() < tuple.getTimestamp()){
+					this.storage.remove(key);
+				}
+			}else{
+				this.storage.remove(key);
+			}
 		}
 	}
 	
 	public Tuple get(String key){
 		synchronized(mutex){
-			System.out.println("get = "+key);
+			//System.out.println("get = "+key);
 			return this.storage.get(key);
 		}
 	}
@@ -41,8 +55,15 @@ public class DataStoreService {
 	public void update(Tuple tuple){
 		String key = tuple.getKey();
 		synchronized(mutex){
-			System.out.println("update = "+tuple);
-			this.storage.put(key, tuple);
+			//System.out.println("update = "+tuple);
+			if(this.storage.containsKey(key)){
+				Tuple item = this.storage.get(key);
+				if(item.getTimestamp() < tuple.getTimestamp()){
+					this.storage.put(key, tuple);
+				}
+			}else{
+				this.storage.put(key, tuple);
+			}
 		}
 	}
 	
