@@ -15,8 +15,13 @@ public class NoSQL {
 		NodeConf conf = NodeConf.getInstance();
 		conf.setMachineHashCode(localHashCode);
 		conf.setReplicas(replcas);
-		conf.setDropRate(Double.parseDouble(args[3]));
-		conf.setDelay(Integer.parseInt(args[4]));
+		String[] delayTokens = args[3].split(",");
+		for(int i = 0; i < delayTokens.length; ++i){
+			String[] pairs = delayTokens[i].split(":");
+			int hashCode = Integer.parseInt(pairs[0]);
+			int delay = Integer.parseInt(pairs[1]);
+			conf.insertDelayEntry(hashCode, delay);
+		}
 		
 		
 		String line;

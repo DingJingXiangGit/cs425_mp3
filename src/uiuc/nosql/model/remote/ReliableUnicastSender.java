@@ -96,7 +96,7 @@ public class ReliableUnicastSender {
                 // Only send with some probability
 				if (_rand.nextDouble() >= _nodeConf.getDropRate()) {
                     // Delay based on input argument
-                    int meanDelay = _nodeConf.getDelay();
+                    int meanDelay = _nodeConf.getDelay(replicaHashCode);//_nodeConf.getDelay();
                     if (meanDelay != 0) {
                         Timer delayTimer = new Timer();
                         TimerTask delaySender = new DelaySender(sendPacket, _socket);
@@ -146,7 +146,7 @@ public class ReliableUnicastSender {
             if (timer == null) {
                 return;
             }
-            System.out.println("resend message "+message);
+            //System.out.println("resend message "+message);
 			task.cancel();
 			timer.cancel();
 			timer.purge();
@@ -166,7 +166,7 @@ public class ReliableUnicastSender {
 				double rate = _rand.nextDouble();
 				if (rate >= _nodeConf.getDropRate()) {
 					
-					int meanDelay = _nodeConf.getDelay();
+					int meanDelay = _nodeConf.getDelay(replicaHashCode);
                     if (meanDelay != 0) {
                         Timer delayTimer = new Timer();
                         TimerTask delaySender = new DelaySender(sendPacket, _socket);
@@ -230,7 +230,7 @@ public class ReliableUnicastSender {
 		byte[] data;
 		DatagramPacket sendPacket;
 		double rate = 0.0;
-		
+		int hashCode = -1;
 		message = new Message(msg);
 		message.setId(_nodeConf.getMachineHashCode());
 		message.setAction("ack");
@@ -239,9 +239,10 @@ public class ReliableUnicastSender {
 		address = InetAddress.getByName(member.getIp());
 		sendPacket = new DatagramPacket(data, data.length, address,  member.getPort());
 		rate = _rand.nextDouble();
+		hashCode = member.getHashCode();
 		
 		if (rate >= _nodeConf.getDropRate()) {
-			int meanDelay = _nodeConf.getDelay();
+			int meanDelay = _nodeConf.getDelay(hashCode);
             if (meanDelay != 0) {
                 Timer delayTimer = new Timer();
                 TimerTask delaySender = new DelaySender(sendPacket, _socket);

@@ -1,5 +1,6 @@
 package uiuc.nosql.model.task;
 
+import uiuc.nosql.controller.TaskManager;
 import uiuc.nosql.model.Action;
 import uiuc.nosql.model.Level;
 import uiuc.nosql.model.Request;
@@ -10,9 +11,9 @@ public abstract class Task {
 	protected Level level;
 	protected Action action;
 	protected Request request;
+	protected TaskManager taskManager;
 	
-	
-	public abstract boolean consume(Response response);
+	public abstract void consume(Response response);
 
 	public int getTaskId() {
 		return taskId;
@@ -45,4 +46,11 @@ public abstract class Task {
 	public void setAction(Action action) {
 		this.action = action;
 	}
+
+	public void setManager(TaskManager taskManager) {
+		this.taskManager = taskManager;
+	}
+
+	public abstract boolean isResultReady();
+	public abstract void printResult();
 }

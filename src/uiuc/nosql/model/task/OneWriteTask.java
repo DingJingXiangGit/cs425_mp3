@@ -1,14 +1,16 @@
 package uiuc.nosql.model.task;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import uiuc.nosql.model.Response;
 
 public class OneWriteTask  extends Task{
-	
 	private int taskId;
-	//private int source;
-	//private int numReplicas;
+	private Set<Integer> sources;
 	
 	public OneWriteTask(){
+		sources = new HashSet<Integer>();
 	}
 	
 	public int getTaskId() {
@@ -19,29 +21,33 @@ public class OneWriteTask  extends Task{
 		this.taskId = taskId;
 	}
 
-	public boolean consume(Response response) {
+	public void consume(Response response) {
 		int source = response.getSender();
 		if(source != -1){
-			//System.out.println("task #"+taskId+" receives acks from: "+source);
-			System.out.println(request + " completed");
-			return true;
+			System.out.println("task #"+taskId+" receives acks from: "+source);
+			sources.add(source);
 		}
-		return false;
 	}
 	
 	public String toString(){
 		return "One Write " + taskId;
 	}
-	
-	/*
-	public int getNumReplicas() {
-		return numReplicas;
-	}
 
-	public void setNumReplicas(int numReplicas) {
-		this.numReplicas = numReplicas;
+	@Override
+	public boolean isResultReady() {
+		if(this.sources.size() > 0){
+			return true;
+		}
+		return false;
 	}
-	*/
 	
-	
+	public void printResult(){
+		if(isResultReady()){
+			System.out.println(request + " completed");
+		}else{
+			//System.out.println(requ);
+			
+		}
+		
+	}
 }

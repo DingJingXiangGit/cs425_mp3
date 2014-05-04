@@ -8,5 +8,6 @@ public enum Action implements Serializable{
 	Get,
 	Delete,
 	ShowAll,
-	Search
+	Search,
+	Repair
 }

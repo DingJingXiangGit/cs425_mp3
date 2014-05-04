@@ -53,7 +53,7 @@ public class Response implements Serializable, IMessageContent{
 				stringBuffer.append(tuple).append(", ");
 			}
 		}
-		stringBuffer.append("]");
+		stringBuffer.append("]").append("}");
 		return stringBuffer.toString();
 	}
 }

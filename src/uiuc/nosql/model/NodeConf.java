@@ -9,14 +9,17 @@ public class NodeConf {
 	private Map<Integer, ServerNode> serverNodes;
 	private List<Integer> nodeIds;
 	private static NodeConf instance;
-	private int delay;
+	//private int delay;
 	private double dropRate;
 	private boolean isDetailMode;
-
+	private Map<Integer, Integer> delayTable;
+	
 	private NodeConf(){
 		serverNodes = new HashMap<Integer, ServerNode>();
+		delayTable = new HashMap<Integer, Integer>();
 		nodeIds = new ArrayList<Integer>();
 		isDetailMode = false;
+		dropRate = 0.0;
 	}
 	
 	public static NodeConf getInstance(){
@@ -24,6 +27,10 @@ public class NodeConf {
 			instance = new NodeConf();
 		}
 		return instance;
+	}
+	
+	public void insertDelayEntry(int hashCode, int delay){
+		delayTable.put(hashCode, delay);
 	}
 	
 	public void setMachineHashCode(int hashCode){
@@ -43,7 +50,6 @@ public class NodeConf {
 		return nodeIds;
 	}
 
-	
 	public ServerNode getServerNode(int hashCode){
 		return serverNodes.get(hashCode);
 	}
@@ -60,13 +66,13 @@ public class NodeConf {
 		return this.replicas;
 	}
 	
-	public int getDelay() {
-		return delay;
+	public int getDelay(int i) {
+		return delayTable.get(i);
 	}
 
-	public void setDelay(int delay) {
-		this.delay = delay;
-	}
+//	public void setDelay(int delay) {
+//		this.delay = delay;
+//	}
 	
 	public double getDropRate() {
 		return dropRate;

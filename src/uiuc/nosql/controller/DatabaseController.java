@@ -13,6 +13,7 @@ import uiuc.nosql.model.Tuple;
 import uiuc.nosql.model.remote.RemoteListenService;
 import uiuc.nosql.model.remote.RemoteRequestService;
 import uiuc.nosql.model.remote.ServerNode;
+import uiuc.nosql.model.task.RepairTask;
 import uiuc.nosql.model.task.Task;
 
 public class DatabaseController {
@@ -45,9 +46,16 @@ public class DatabaseController {
 	
 	public void execute(Task task){
 		Request request = task.getRequest();
-		if(request.getAction() == Action.ShowAll){
+		Action action = request.getAction();
+		if(action == Action.Repair){
+			RepairTask repairTask = (RepairTask)task;
+			List<Integer> targetList =  repairTask.getTargetList();
+			for(int i = 0; i < targetList.size(); ++i){
+				remoteRequestService.execute(request, targetList.get(i));
+			}
+		}else if(action == Action.ShowAll){
 			digest(request);
-		}else if(request.getAction() == Action.Search){
+		}else if(action == Action.Search){
 			search(request);
 		}else{
 			int total = Math.min(this.numReplicas, conf.getServerNodes().size());

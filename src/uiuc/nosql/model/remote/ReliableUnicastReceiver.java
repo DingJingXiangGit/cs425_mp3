@@ -105,7 +105,7 @@ public class ReliableUnicastReceiver implements Runnable {
 	}
 	
 	public void delivery(Message message){
-		System.out.println("receive message:" + message);
+		System.out.println("receive message:" + message.getContent());
 		this._rls.acceptMessage(message);
 	}
 }
