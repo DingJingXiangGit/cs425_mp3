@@ -178,6 +178,22 @@ public class DatabaseController {
 			}else{
 				TaskManager.getInstance().processResponse(response);
 			}
+		}else if(command.getAction() == Action.Repair){
+			Tuple tuple = new Tuple();
+			tuple.setKey(command.getKey());
+			tuple.setValue(command.getValue());
+			tuple.setTimestamp(command.getTimestamp());
+			this.dataStore.update(tuple);
+			
+			Response response = new Response();
+			response.setInitiator(command.getInitiator());
+			response.setTaskId(command.getTaskId());
+			response.setSender(localHashCode);
+			if(command.getInitiator() != localHashCode){
+				this.remoteRequestService.execute(response, command.getInitiator());
+			}else{
+				TaskManager.getInstance().processResponse(response);
+			}
 		}
 	}
 }

@@ -98,9 +98,11 @@ public class ReliableUnicastSender {
                     // Delay based on input argument
                     int meanDelay = _nodeConf.getDelay(replicaHashCode);//_nodeConf.getDelay();
                     if (meanDelay != 0) {
+                    	long trueDelay = getRandomDelay(meanDelay);
+                    	//System.out.println("true delay is:"+trueDelay);
                         Timer delayTimer = new Timer();
                         TimerTask delaySender = new DelaySender(sendPacket, _socket);
-                        delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
+                        delayTimer.schedule(delaySender,trueDelay);
                     }else{
                     	_socket.send(sendPacket);
                     }
@@ -168,9 +170,11 @@ public class ReliableUnicastSender {
 					
 					int meanDelay = _nodeConf.getDelay(replicaHashCode);
                     if (meanDelay != 0) {
+                    	long trueDelay = getRandomDelay(meanDelay);
+                    	//System.out.println("resend delay: "+trueDelay);
                         Timer delayTimer = new Timer();
                         TimerTask delaySender = new DelaySender(sendPacket, _socket);
-                        delayTimer.schedule(delaySender, getRandomDelay(meanDelay));
+                        delayTimer.schedule(delaySender, trueDelay);
                     }else{
                     	_socket.send(sendPacket);
                     }

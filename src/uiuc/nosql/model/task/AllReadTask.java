@@ -45,7 +45,7 @@ public class AllReadTask extends Task{
 	}
 	
 	private void startRepair(){
-		System.out.println("\n all start read repair\n");
+		//System.out.println("\n all start read repair\n");
 		String value = null;
 		long timestamp = -1;
 		List<Tuple> tuples = new ArrayList<Tuple>();
@@ -75,6 +75,7 @@ public class AllReadTask extends Task{
 			if(inconsistentList.size() == 0){
 				System.out.println("Consistency Checked No Need to Repair");
 			}else{
+				System.out.println("Consistency Checked: Repair Start.");
 				taskManager.deployRepairTask(consistentTuple, inconsistentList);
 			}
 		}else{

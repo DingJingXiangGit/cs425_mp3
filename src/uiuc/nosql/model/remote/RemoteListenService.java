@@ -33,7 +33,7 @@ public class RemoteListenService {
 			database.execute(command);
 		}else{
 			Response response = (Response)content;
-			System.out.println(response.toString());
+			//System.out.println(response.toString());
 			TaskManager.getInstance().processResponse(response);
 		}
 	}

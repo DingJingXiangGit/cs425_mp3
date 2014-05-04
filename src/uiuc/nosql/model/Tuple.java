@@ -51,7 +51,7 @@ public class Tuple implements Serializable, Comparable<Tuple>{
 	
 	@Override
 	public String toString(){
-		return String.format("{%s, %s}", key, value);
+		return String.format("{%s, %s, %s}", key, value, timestamp);
 	}
 
 	public long getTimestamp() {

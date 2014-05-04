@@ -137,6 +137,8 @@ public class TaskManager {
 		task.setTaskId(taskIdIndexer++);
 		task.setAction(Action.Repair);
 		task.setLevel(Level.One);
+		task.setTuple(tuple);
+		
 		request.setTaskId(task.getTaskId());
 		tasksTable.put(task.getTaskId(), task);
 		databaseController.execute(task);

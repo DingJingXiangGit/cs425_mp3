@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import uiuc.nosql.model.Action;
-import uiuc.nosql.model.Request;
 import uiuc.nosql.model.Response;
 import uiuc.nosql.model.Tuple;
 
@@ -50,7 +48,7 @@ public class OneReadTask extends Task{
 	}
 	
 	private void startRepair(){
-		System.out.println("\n one start read repair\n");
+		//System.out.println("\n one start read repair\n");
 		String value = null;
 		long timestamp = -1;
 		List<Tuple> tuples = new ArrayList<Tuple>();
@@ -79,6 +77,7 @@ public class OneReadTask extends Task{
 			if(inconsistentList.size() == 0){
 				System.out.println("Consistency Checked No Need to Repair");
 			}else{
+				System.out.println("Consistency Checked: Repair Start.");
 				taskManager.deployRepairTask(consistentTuple, inconsistentList);
 			}
 		}else{
