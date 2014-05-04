@@ -52,6 +52,7 @@ public class Console {
 			}else if(operator.equals("search")){
 				request = new Request();
 				request.setAction(Action.Search);
+				request.setLevel(Level.All);
 				request.setKey(scanner.next());
 			}else if(operator.equals("exit")){
 				System.out.println("Bye.");

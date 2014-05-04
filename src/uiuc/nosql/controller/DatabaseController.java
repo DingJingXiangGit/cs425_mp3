@@ -14,6 +14,7 @@ import uiuc.nosql.model.remote.RemoteListenService;
 import uiuc.nosql.model.remote.RemoteRequestService;
 import uiuc.nosql.model.remote.ServerNode;
 import uiuc.nosql.model.task.RepairTask;
+import uiuc.nosql.model.task.SearchTask;
 import uiuc.nosql.model.task.Task;
 
 public class DatabaseController {
@@ -56,7 +57,7 @@ public class DatabaseController {
 		}else if(action == Action.ShowAll){
 			digest(request);
 		}else if(action == Action.Search){
-			search(request);
+			search(task);
 		}else{
 			int total = Math.min(this.numReplicas, conf.getServerNodes().size());
 			int[] hashCodes = hashService.hash(request.getKey(), total);
@@ -73,16 +74,31 @@ public class DatabaseController {
 		}
 	}
 	
-	private void search(Request request) {
-		String key = request.getKey();
-		int total = Math.min(this.numReplicas, conf.getServerNodes().size());
-		int[] hashCodes = hashService.hash(key, total);
+//	private void search(Request request) {
+//		String key = request.getKey();
+//		int total = Math.min(this.numReplicas, conf.getServerNodes().size());
+//		int[] hashCodes = hashService.hash(key, total);
+//		int hashCode = -1;
+//		ServerNode replica;
+//		for(int i = 0; i < hashCodes.length; ++i){
+//			hashCode = hashCodes[i];
+//			replica = conf.getServerNode(hashCode);
+//			System.out.println(replica);
+//		}
+//	}
+	
+	private void search(Task task) {
+		SearchTask searchTask = (SearchTask)task;
+		List<Integer> waitingList = searchTask.getWaitingList();
+		Request request = searchTask.getRequest();
 		int hashCode = -1;
-		ServerNode replica;
-		for(int i = 0; i < hashCodes.length; ++i){
-			hashCode = hashCodes[i];
-			replica = conf.getServerNode(hashCode);
-			System.out.println(replica);
+		for(int i = 0; i < waitingList.size(); ++i){
+			hashCode = waitingList.get(i);
+			if(hashCode == localHashCode){
+				digest(request);
+			}else{
+				remoteRequestService.execute(request, hashCode);
+			}
 		}
 	}
 
@@ -147,6 +163,20 @@ public class DatabaseController {
 			System.out.println("there are "+tuples.size() +" in local server.");
 			for(Tuple tuple: tuples){
 				System.out.println(tuple);
+			}
+		}else if(command.getAction() == Action.Search){
+			Tuple tuple = this.dataStore.get(command.getKey());
+			Response response = new Response();
+			List<Tuple> result = new LinkedList<Tuple>();
+			result.add(tuple);
+			response.setTuples(result);
+			response.setInitiator(command.getInitiator());
+			response.setSender(localHashCode);
+			response.setTaskId(command.getTaskId());
+			if(command.getInitiator() != localHashCode){
+				this.remoteRequestService.execute(response, command.getInitiator());
+			}else{
+				TaskManager.getInstance().processResponse(response);
 			}
 		}
 	}
