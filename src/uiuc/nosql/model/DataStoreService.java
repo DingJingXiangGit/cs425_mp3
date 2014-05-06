@@ -18,6 +18,13 @@ public class DataStoreService {
 		return instance;
 	}
 	
+	public boolean exist(Tuple tuple){
+		String key = tuple.getKey();
+		synchronized(mutex){
+			return this.storage.containsKey(key);
+		}
+	}
+	
 	public void insert(Tuple tuple){
 		String key = tuple.getKey();
 		synchronized(mutex){

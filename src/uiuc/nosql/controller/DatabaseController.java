@@ -166,9 +166,6 @@ public class DatabaseController {
 		} else if (command.getAction() == Action.Search) {
 			Tuple tuple = this.dataStore.get(command.getKey());
 			Response response = new Response();
-			// List<Tuple> result = new LinkedList<Tuple>();
-			// result.add(tuple);
-			// response.setTuples(result);
 			response.setTuple(tuple);
 			response.setInitiator(command.getInitiator());
 			response.setSender(localHashCode);
