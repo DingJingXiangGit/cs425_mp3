@@ -12,11 +12,13 @@ import uiuc.nosql.model.Tuple;
 
 public class OneReadTask extends Task{
 	private int taskId;
-	private Map<Integer, List<Tuple>> responseTuple;
+	//private Map<Integer, List<Tuple>> responseTuple;
+	private Map<Integer, Tuple> responseTuple;
 	private int numReplicas;
 
 	public OneReadTask(){
-		responseTuple = new HashMap<Integer, List<Tuple>>();
+		//responseTuple = new HashMap<Integer, List<Tuple>>();
+		responseTuple = new HashMap<Integer, Tuple>();
 	}
 	
 	public int getNumReplicas() {
@@ -39,7 +41,9 @@ public class OneReadTask extends Task{
 	public void consume(Response response) {
 		int source = response.getSender();
 		if(source != -1){
-			this.responseTuple.put(source, response.getTuples());
+			//this.responseTuple.put(source, response.getTuples());
+			this.responseTuple.put(source, response.getTuple());
+			System.out.println("task #"+taskId+" receives acks from: "+source);
 		}
 		
 		if(this.responseTuple.size() == numReplicas){
@@ -52,8 +56,10 @@ public class OneReadTask extends Task{
 		String value = null;
 		long timestamp = -1;
 		List<Tuple> tuples = new ArrayList<Tuple>();
-		for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
-			tuples.addAll(entry.getValue());
+		//for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+		for(Entry<Integer, Tuple> entry: this.responseTuple.entrySet()){
+			//tuples.addAll(entry.getValue());
+			tuples.add(entry.getValue());
 		}
 		tuples.removeAll(Collections.singleton(null));
 		if(tuples.size() > 0){
@@ -63,7 +69,19 @@ public class OneReadTask extends Task{
 			value = consistentTuple.getValue();
 			timestamp = consistentTuple.getTimestamp();
 			
-			for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+			//for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+			for(Entry<Integer, Tuple> entry: this.responseTuple.entrySet()){
+				Tuple entryTuple = entry.getValue();
+				if(entryTuple == null){
+					inconsistentList.add(entry.getKey());
+				}else{
+					//System.out.println("tuple is "+entryTuple);
+					if(entryTuple.getTimestamp() != timestamp ||
+							entryTuple.getValue().equals(value) == false){
+						inconsistentList.add(entry.getKey());
+					}
+				}
+				/*
 				entry.getValue().removeAll(Collections.singleton(null));
 				if(entry.getValue().size() == 0){
 					inconsistentList.add(entry.getKey());
@@ -75,6 +93,7 @@ public class OneReadTask extends Task{
 						inconsistentList.add(entry.getKey());
 					}
 				}
+				*/
 			}
 			if(inconsistentList.size() == 0){
 				System.out.println("Consistency Checked No Need to Repair");
@@ -98,16 +117,21 @@ public class OneReadTask extends Task{
 	
 	public void printResult(){
 		List<Tuple> tuples = new ArrayList<Tuple>();
-		for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+		/*for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+			for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
 			tuples.addAll(entry.getValue());
+		}*/
+		for(Entry<Integer, Tuple> entry: this.responseTuple.entrySet()){
+			tuples.add(entry.getValue());
 		}
+		
 		tuples.removeAll(Collections.singleton(null)); 
 		if(tuples.size() > 0){
 			Collections.sort(tuples, Collections.reverseOrder());
-			System.out.println(request + " completed");
+			System.out.println("One Read Task #"+taskId+" is completed");
 			System.out.println("result: " + tuples.get(0));
 		}else{
-			System.out.println(request + " completed");
+			System.out.println("One Read Task #"+taskId+" is completed");
 			System.out.println("result: null");
 		}
 	}

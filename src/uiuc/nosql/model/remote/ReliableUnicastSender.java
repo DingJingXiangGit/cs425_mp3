@@ -67,7 +67,7 @@ public class ReliableUnicastSender {
 				_nextSendSequence.put(replicaHashCode, 0);
 			}
 			if(_timerTable.containsKey(replicaHashCode) == false){
-				System.out.println("send to replica := "+replica);
+				//System.out.println("send to replica := "+replica);
 				_timerTable.put(replicaHashCode, new Hashtable<Integer, Timer>());
 			}
 			

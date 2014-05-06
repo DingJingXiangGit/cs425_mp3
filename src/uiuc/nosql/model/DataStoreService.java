@@ -3,12 +3,14 @@ import java.util.*;
 
 public class DataStoreService {
 	private Map<String, Tuple> storage;
+	private Map<String, Long> ghostTable;
 	private Object mutex;
 	
 	private static DataStoreService instance = new DataStoreService();
 	
 	private DataStoreService(){
 		storage = new HashMap<String, Tuple>();
+		ghostTable = new HashMap<String, Long>();
 		mutex  = new Object();
 	}
 	
@@ -19,13 +21,19 @@ public class DataStoreService {
 	public void insert(Tuple tuple){
 		String key = tuple.getKey();
 		synchronized(mutex){
-			if(this.storage.containsKey(key)){
+			if(this.storage.containsKey(key) == true){
 				Tuple item = this.storage.get(key);
 				if(item.getTimestamp() < tuple.getTimestamp()){
 					this.storage.put(key, tuple);
 				}
 			}else{
-				this.storage.put(key, tuple);
+				if(ghostTable.containsKey(key)==false){
+					this.storage.put(key, tuple);
+				}else{
+					if(ghostTable.get(key) < tuple.getTimestamp()){
+						this.storage.put(key, tuple);
+					}
+				}
 			}
 		}
 	}
@@ -33,21 +41,21 @@ public class DataStoreService {
 	public void delete(Tuple tuple){
 		String key = tuple.getKey();
 		synchronized(mutex){
-			//System.out.println("delete = "+key);
 			if(this.storage.containsKey(key)){
 				Tuple item = this.storage.get(key);
 				if(item.getTimestamp() < tuple.getTimestamp()){
 					this.storage.remove(key);
+					this.ghostTable.put(key, tuple.getTimestamp());
 				}
 			}else{
 				this.storage.remove(key);
+				this.ghostTable.put(key, tuple.getTimestamp());
 			}
 		}
 	}
 	
 	public Tuple get(String key){
 		synchronized(mutex){
-			//System.out.println("get = "+key);
 			return this.storage.get(key);
 		}
 	}
@@ -55,14 +63,19 @@ public class DataStoreService {
 	public void update(Tuple tuple){
 		String key = tuple.getKey();
 		synchronized(mutex){
-			//System.out.println("update = "+tuple);
 			if(this.storage.containsKey(key)){
 				Tuple item = this.storage.get(key);
 				if(item.getTimestamp() < tuple.getTimestamp()){
 					this.storage.put(key, tuple);
 				}
 			}else{
-				this.storage.put(key, tuple);
+				if(ghostTable.containsKey(key)==false){
+					this.storage.put(key, tuple);
+				}else{
+					if(ghostTable.get(key) < tuple.getTimestamp()){
+						this.storage.put(key, tuple);
+					}
+				}
 			}
 		}
 	}

@@ -8,18 +8,20 @@ public class Response implements Serializable, IMessageContent{
 	 * 
 	 */
 	private static final long serialVersionUID = 6152452364222421899L;
-	private List<Tuple> tuples;
+	//private List<Tuple> tuples;
+	private Tuple tuple;
 	private int initiator;
 	private int sender;
 	private int taskId;
 	
-	
+	/*
 	public List<Tuple> getTuples() {
 		return tuples;
 	}
 	public void setTuples(List<Tuple> tuples) {
 		this.tuples = tuples;
 	}
+	*/
 	public int getInitiator() {
 		return initiator;
 	}
@@ -48,12 +50,20 @@ public class Response implements Serializable, IMessageContent{
 		stringBuffer.append("{content:response, initiator:"+initiator+", task:"+taskId);
 		stringBuffer.append(", sender:").append(sender);
 		stringBuffer.append(", content:[");
-		if(tuples != null){
+		stringBuffer.append(tuple);
+		/*if(tuples != null){
 			for(Tuple tuple:tuples){
 				stringBuffer.append(tuple).append(", ");
 			}
 		}
+		*/
 		stringBuffer.append("]").append("}");
 		return stringBuffer.toString();
+	}
+	public Tuple getTuple() {
+		return tuple;
+	}
+	public void setTuple(Tuple tuple) {
+		this.tuple = tuple;
 	}
 }

@@ -15,12 +15,14 @@ import uiuc.nosql.model.Tuple;
 public class AllReadTask extends Task{
 	private int taskId;
 	private Set<Integer> sources;
-	private Map<Integer, List<Tuple>> responseTuple;
+	//private Map<Integer, List<Tuple>> responseTuple;
+	private Map<Integer, Tuple> responseTuple;
 	private int numReplicas;
 	
 	public AllReadTask(){
 		sources = new HashSet<Integer>();
-		responseTuple = new HashMap<Integer, List<Tuple>>();
+		//responseTuple = new HashMap<Integer, List<Tuple>>();
+		responseTuple = new HashMap<Integer, Tuple>();
 	}
 	
 	public int getTaskId() {
@@ -36,7 +38,7 @@ public class AllReadTask extends Task{
 		int source = response.getSender();
 		if(sources.contains(source) == false){
 			sources.add(source);
-			responseTuple.put(source, response.getTuples());
+			responseTuple.put(source, response.getTuple());
 		}
 		
 		if(this.sources.size() == numReplicas){
@@ -49,9 +51,14 @@ public class AllReadTask extends Task{
 		String value = null;
 		long timestamp = -1;
 		List<Tuple> tuples = new ArrayList<Tuple>();
-		for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+		/*for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
 			tuples.addAll(entry.getValue());
 		}
+		*/
+		for(Entry<Integer, Tuple> entry: this.responseTuple.entrySet()){
+			tuples.add(entry.getValue());
+		}
+		
 		tuples.removeAll(Collections.singleton(null));
 		if(tuples.size() > 0){
 			List<Integer> inconsistentList = new ArrayList<Integer>();
@@ -60,6 +67,22 @@ public class AllReadTask extends Task{
 			value = consistentTuple.getValue();
 			timestamp = consistentTuple.getTimestamp();
 			
+			for(Entry<Integer, Tuple> entry: this.responseTuple.entrySet()){
+				Tuple entryTuple = entry.getValue();
+				//entry.getValue().removeAll(Collections.singleton(null));
+				if(entryTuple == null){
+					inconsistentList.add(entry.getKey());
+				}else{
+					//Tuple tuple = entry.getValue().get(0);
+					if(entryTuple.getTimestamp() != timestamp ||
+							entryTuple.getValue().equals(value) == false){
+						inconsistentList.add(entry.getKey());
+					}
+				}
+			}
+			
+			
+			/*
 			for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
 				entry.getValue().removeAll(Collections.singleton(null));
 				if(entry.getValue().size() == 0){
@@ -71,7 +94,7 @@ public class AllReadTask extends Task{
 						inconsistentList.add(entry.getKey());
 					}
 				}
-			}
+			}*/
 			if(inconsistentList.size() == 0){
 				System.out.println("Consistency Checked No Need to Repair");
 			}else{
@@ -102,16 +125,19 @@ public class AllReadTask extends Task{
 	
 	public void printResult(){
 		List<Tuple> tuples = new ArrayList<Tuple>();
-		for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+		/*for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
 			tuples.addAll(entry.getValue());
+		}*/
+		for(Entry<Integer, Tuple> entry: this.responseTuple.entrySet()){
+			tuples.add(entry.getValue());
 		}
 		tuples.removeAll(Collections.singleton(null)); 
 		if(tuples.size() > 0){
 			Collections.sort(tuples, Collections.reverseOrder());
-			System.out.println(request + " completed");
+			System.out.println("All Read Task #"+taskId+" is completed");
 			System.out.println("result: " + tuples.get(0));
 		}else{
-			System.out.println(request + " completed");
+			System.out.println("All Read Task #"+taskId+" is completed");
 			System.out.println("result: null");
 		}
 	}

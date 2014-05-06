@@ -26,11 +26,19 @@ public class SearchTask extends Task{
 	
 	@Override
 	public void consume(Response response) {
-		List<Tuple> tuples = response.getTuples();
+		/*List<Tuple> tuples = response.getTuples();
 		tuples.removeAll(Collections.singleton(null));
 		int sender = response.getSender();
 		receivedList.add(sender);
 		if(tuples.size() > 0){
+			NodeConf nodeConf = NodeConf.getInstance();
+			ServerNode node = nodeConf.getServerNode(sender);
+			nodeMap.put(sender, node);
+		}*/
+		Tuple tuple = response.getTuple();
+		int sender = response.getSender();
+		receivedList.add(sender);
+		if(tuple != null){
 			NodeConf nodeConf = NodeConf.getInstance();
 			ServerNode node = nodeConf.getServerNode(sender);
 			nodeMap.put(sender, node);

@@ -43,10 +43,9 @@ public class OneWriteTask  extends Task{
 	
 	public void printResult(){
 		if(isResultReady()){
-			System.out.println(request + " completed");
+			System.out.println("One Write Task #"+taskId+" is completed");
 		}else{
-			//System.out.println(requ);
-			
+			System.out.println("One Write Task #"+taskId+" is completed");
 		}
 		
 	}
