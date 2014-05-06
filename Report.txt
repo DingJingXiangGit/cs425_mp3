@@ -27,3 +27,10 @@ Inconsistency Repair
 --------------------
 To repair inconsistency we use read repairs. For read level ONE, once we send the user result, the operation continues in the background and checks the values and timestamps of all the other replicas. If a node has a value different to the latest one, we send a message to that node to change the value to latest. For read level ALL, once all replicas reply we return the value with the latest timestamp to the user, and then check for consistency, and again tell nodes to replace values if they differ.
 
+Prevent Repair/Insert/Update Deleting Key
+---------------------------
+Since inconsistency can be caused by read repairing a deleting key, we use a ghost table to maintain the timestamp of the key been
+deleted. The basic idea is that whenever a key is delete, the timestamp of the operation as well as the key will be saved inside
+a hashtable. Thus, the a repair, insert, or update operation will less timestamp arrived the replicas later, these operations will
+be checked to indentify whether a delete operation with larger timestamp existed inside the replicas, if so these write operations
+will be ignore, otherwise these operation will be executed.
