@@ -1,0 +1,29 @@
+======
+Report
+======
+
+For this MP, we closesly followed the implementation model of Cassandra. 
+
+Messaging
+---------
+In order to send and receive messages, we use the Reliable Unicast Sender and Receiver from MP2. The sender awaits for an ACK message from the Receiver and retransmits the message for some time to ensure receipt. The randomized delay is integrated into the sender.
+
+Key Hashing
+-----------
+We use a simple hashing algorithm to determine which replicas will be responsible for the given key:
+
+(Hash(key string) + i) mod (#total nodes)
+	i - is the ith replica's id
+	keyString - the key to be inserted
+	Hash - standard Java hashing function for strings
+
+Read and Write Operations
+-------------------------
+For consistency level ONE, we complete the operation as soon as a replica that is responsible for the key replies. For reads, we return the value of the key, for writes, after receiving at least one ACk, we notify the user the write operation completed.
+
+For consistency level ALL, we complete the operation once all replicas either give results or acknowledge the operation. For reads, once we get the values from all the ndoes responsible for the key, we return the value with the latest timestamp (repairs exaplained next). For writes, we notify the user the operation completed once the responsible replicas ACK the write.
+
+Inconsistency Repair
+--------------------
+To repair inconsistency we use read repairs. For read level ONE, once we send the user result, the operation continues in the background and checks the values and timestamps of all the other replicas. If a node has a value different to the latest one, we send a message to that node to change the value to latest. For read level ALL, once all replicas reply we return the value with the latest timestamp to the user, and then check for consistency, and again tell nodes to replace values if they differ.
+

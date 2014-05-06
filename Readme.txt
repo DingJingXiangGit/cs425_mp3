@@ -57,7 +57,7 @@ Algorithms
 ----------
 (See report for details)
     Read repair:
-        whether a read request is fired, after received all responses from differe replicas, the coordinator will
+        whether a read request is fired, after received all responses from differet replicas, the coordinator will
         check whether all responsed tuples have same timestamp.
         If some tuples' timestamp is smaller than the largest one, then the read Repair will start by sending repair
         request to the replicas that return tuple with small timestamp.
