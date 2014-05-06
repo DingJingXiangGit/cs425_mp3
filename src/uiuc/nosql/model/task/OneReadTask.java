@@ -64,10 +64,12 @@ public class OneReadTask extends Task{
 			timestamp = consistentTuple.getTimestamp();
 			
 			for(Entry<Integer, List<Tuple>> entry: this.responseTuple.entrySet()){
+				entry.getValue().removeAll(Collections.singleton(null));
 				if(entry.getValue().size() == 0){
 					inconsistentList.add(entry.getKey());
 				}else{
 					Tuple tuple = entry.getValue().get(0);
+					System.out.println("tuple is "+tuple);
 					if(tuple.getTimestamp() != timestamp ||
 							tuple.getValue().equals(value) == false){
 						inconsistentList.add(entry.getKey());

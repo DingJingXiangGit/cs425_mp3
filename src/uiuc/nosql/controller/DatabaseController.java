@@ -51,20 +51,25 @@ public class DatabaseController {
 		if(action == Action.Repair){
 			RepairTask repairTask = (RepairTask)task;
 			List<Integer> targetList =  repairTask.getTargetList();
+			int target = -1;
 			for(int i = 0; i < targetList.size(); ++i){
-				remoteRequestService.execute(request, targetList.get(i));
+				target = targetList.get(i);
+				if(localHashCode!= target){
+					remoteRequestService.execute(request, target);//targetList.get(i));
+				}else{
+					digest(request);
+				}
 			}
 		}else if(action == Action.ShowAll){
 			digest(request);
 		}else if(action == Action.Search){
 			search(task);
 		}else{
-			int total = Math.min(this.numReplicas, conf.getServerNodes().size());
+			int total = this.numReplicas;
 			int[] hashCodes = hashService.hash(request.getKey(), total);
 			int hashCode = -1;
 			for(int i = 0; i < hashCodes.length; ++i){
 				hashCode = hashCodes[i];
-				//System.out.println("target code = "+hashCode +" local code = "+localHashCode);
 				if(hashCode == localHashCode){
 					digest(request);
 				}else{
@@ -73,19 +78,6 @@ public class DatabaseController {
 			}
 		}
 	}
-	
-//	private void search(Request request) {
-//		String key = request.getKey();
-//		int total = Math.min(this.numReplicas, conf.getServerNodes().size());
-//		int[] hashCodes = hashService.hash(key, total);
-//		int hashCode = -1;
-//		ServerNode replica;
-//		for(int i = 0; i < hashCodes.length; ++i){
-//			hashCode = hashCodes[i];
-//			replica = conf.getServerNode(hashCode);
-//			System.out.println(replica);
-//		}
-//	}
 	
 	private void search(Task task) {
 		SearchTask searchTask = (SearchTask)task;
